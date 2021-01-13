@@ -28,6 +28,7 @@ func main() {
 
 	http.Handle("/", router)
 
+	log.Println("Server running :8081")
 	log.Fatal(http.ListenAndServe(":8081", router))
 }
 
