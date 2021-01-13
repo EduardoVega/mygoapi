@@ -5,10 +5,23 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/google/uuid"
 )
+
+// EmptyString validates if a string is empty.
+// Could be improved by using something like https://github.com/xeipuuv/gojsonschema.
+func EmptyString(value string) bool {
+	r, _ := regexp.Compile("^\\s*$")
+
+	if r.MatchString(value) {
+		return true
+	}
+
+	return false
+}
 
 // CreateRandomKey creates a random key for encryp and decrypt operations.
 // This will be the default if no key is found in /etc/mygoapi.

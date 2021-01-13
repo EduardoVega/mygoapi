@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"regexp"
 )
 
 // Handler holds the data for the handler functions.
@@ -28,7 +27,7 @@ func (h *Handler) EncryptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate value.
-	if emptyString(data.Value) {
+	if EmptyString(data.Value) {
 		writeResponse(w, http.StatusBadRequest, map[string]interface{}{
 			"error": "value is required and can not be empty",
 		})
@@ -66,7 +65,7 @@ func (h *Handler) DecryptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate value.
-	if emptyString(data.Value) {
+	if EmptyString(data.Value) {
 		writeResponse(w, http.StatusBadRequest, map[string]interface{}{
 			"error": "value is required and can not be empty",
 		})
@@ -86,18 +85,6 @@ func (h *Handler) DecryptHandler(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, http.StatusOK, map[string]interface{}{
 		"value": value,
 	})
-}
-
-// emptyString validates if a string is empty.
-// Could be improved by using something like https://github.com/xeipuuv/gojsonschema.
-func emptyString(value string) bool {
-	r, _ := regexp.Compile("^\\s*$")
-
-	if r.MatchString(value) {
-		return true
-	}
-
-	return false
 }
 
 // writeResponse writes API responses for the handlers.
