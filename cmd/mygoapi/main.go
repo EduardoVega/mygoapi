@@ -1,24 +1,26 @@
 package main
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"log"
-	"math/rand"
-	"mygoapi/pkg/handler"
+	"mygoapi/pkg/api"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
 
+// characters is used to generate a random key.
 const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-// Key holds the passphrase used for encryption and decryption.
-var Key string
+// keyFile holds the path to the file containing the key.
+const keyFile = "/etc/mygoapi"
+
+// key holds the passphrase used for encryption and decryption.
+var key string
 
 func main() {
 
-	h := handler.Handler{Key: Key}
+	h := api.Handler{Key: key}
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/encrypt", h.EncryptHandler).Methods("POST").Headers("Content-Type", "application/json")
@@ -30,28 +32,22 @@ func main() {
 }
 
 func init() {
-	Key = CreateKeyHash(CreateRandomKey())
-}
+	// Generate default key.
+	key = api.CreateRandomKey()
 
-// CreateRandomKey creates a random key for encryp and decrypt operations.
-// This will be the default if no key is found as file or env var.
-// Not the best solution but it works.
-func CreateRandomKey() string {
-	b := make([]byte, 32)
-	for i := range b {
-		b[i] = characters[rand.Intn(len(characters))]
+	// Get key from file.
+	f, err := os.Open(keyFile)
+	defer f.Close()
+	if err != nil {
+		log.Printf("warning opening file with key: %q. Random key will be used", err)
+		return
 	}
-	return string(b)
-}
 
-// CreateKeyHash creates a hash from the key to meet length criteria for AES (32 character key).
-// Used mainly when the user provides the key to avoid any problem.
-func CreateKeyHash(key string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(key))
-	return hex.EncodeToString(hasher.Sum(nil))
-}
+	keyFromFile, err := api.ReadKeyFromFile(f)
+	if err != nil {
+		log.Printf("warning reading key from file: %q. Random key will be used", err)
+		return
+	}
 
-// TODO
-// Read from file
-// Read from env var
+	key = keyFromFile
+}

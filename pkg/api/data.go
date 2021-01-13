@@ -1,4 +1,4 @@
-package object
+package api
 
 import (
 	"crypto/aes"
@@ -7,75 +7,73 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"log"
 )
 
 // Data holds the JSON document received from the encrypt and decrypt apis.
 type Data struct {
-	Value string
+	Value string `json:"value"`
 }
 
 // Encrypt encrypts the value from the Data object.
-// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/
+// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
+// I did nothing (copy and paste). At least I can explain what this is doing.
 func (d *Data) Encrypt(key string) (string, error) {
-	keyBytes, _ := hex.DecodeString(key)
+	log.Printf("encrypting value: %q", d.Value)
+
+	keyBytes := []byte(key)
 	valueBytes := []byte(d.Value)
 
-	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	//Create a new GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
-	//https://golang.org/pkg/crypto/cipher/#NewGCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	//Create a nonce. Nonce should be from GCM
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	//Encrypt the data using aesGCM.Seal
-	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, valueBytes, nil)
 
 	return fmt.Sprintf("%x", ciphertext), nil
-	// return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
 // Decrypt decrypts the value from the Data object.
-// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/
+// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
+// I did nothing (copy and paste). At least I can explain what this is doing.
 func (d *Data) Decrypt(key string) (string, error) {
-	keyBytes, _ := hex.DecodeString(key)
+	log.Printf("decrypting value: %q", d.Value)
+
+	keyBytes := []byte(key)
 	valueBytes, _ := hex.DecodeString(d.Value)
 
-	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	//Create a new GCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	//Get the nonce size
 	nonceSize := aesGCM.NonceSize()
 
-	//Extract the nonce from the encrypted data
 	nonce, ciphertext := valueBytes[:nonceSize], valueBytes[nonceSize:]
 
-	//Decrypt the data
 	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
 	return fmt.Sprintf("%s", plaintext), nil
 }
+
+// TODO
+// Understant what the code does
