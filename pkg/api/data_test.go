@@ -52,7 +52,7 @@ func TestDecrypt(t *testing.T) {
 	}{
 		{
 			"badSizekey",
-			"mysecret",
+			"a35c18b47c54630fe35ec490fb3a1ff5db9934bbcb02ff4ec18eb96a1a1fafef3016d9e1",
 			"",
 			"invalid key size",
 			true,

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"regexp"
 	"strings"
 
@@ -26,8 +25,6 @@ func EmptyString(value string) bool {
 // CreateRandomKey creates a random key for encryp and decrypt operations.
 // This will be the default if no key is found in /etc/mygoapi.
 func CreateRandomKey() string {
-	log.Println("creating default random key")
-
 	uuid := uuid.New().String()
 
 	return uuid[:len(uuid)-4]
@@ -35,8 +32,6 @@ func CreateRandomKey() string {
 
 // ReadKeyFromFile reads the key for encryption and decryption from a file.
 func ReadKeyFromFile(r io.Reader) (string, error) {
-	log.Println("reading key from file")
-
 	content, err := ioutil.ReadAll(r)
 	if err != nil {
 		// any error here will not affect the app.

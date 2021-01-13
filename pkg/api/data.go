@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 )
 
 // Data holds the JSON document received from the encrypt and decrypt apis.
@@ -19,8 +18,6 @@ type Data struct {
 // Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
 // I did nothing (copy and paste). At least I can explain what this is doing.
 func (d *Data) Encrypt(key string) (string, error) {
-	log.Printf("encrypting value: %q", d.Value)
-
 	keyBytes := []byte(key)
 	valueBytes := []byte(d.Value)
 
@@ -48,10 +45,11 @@ func (d *Data) Encrypt(key string) (string, error) {
 // Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
 // I did nothing (copy and paste). At least I can explain what this is doing.
 func (d *Data) Decrypt(key string) (string, error) {
-	log.Printf("decrypting value: %q", d.Value)
-
 	keyBytes := []byte(key)
-	valueBytes, _ := hex.DecodeString(d.Value)
+	valueBytes, err := hex.DecodeString(d.Value)
+	if err != nil {
+		return "", fmt.Errorf("value does not look to be encrypted: %s", err)
+	}
 
 	block, err := aes.NewCipher(keyBytes)
 	if err != nil {

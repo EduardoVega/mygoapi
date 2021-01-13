@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -13,8 +12,6 @@ type Handler struct {
 
 // EncryptHandler initiates the encrypt operation.
 func (h *Handler) EncryptHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("handling encrypt endpoint")
-
 	var data Data
 
 	// Decode JSON.
@@ -51,8 +48,6 @@ func (h *Handler) EncryptHandler(w http.ResponseWriter, r *http.Request) {
 
 // DecryptHandler initiates the decrypt operation.
 func (h *Handler) DecryptHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("handling decrypt endpoint")
-
 	var data Data
 
 	// Decode JSON.
