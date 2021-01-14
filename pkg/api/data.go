@@ -15,8 +15,9 @@ type Data struct {
 }
 
 // Encrypt encrypts the value from the Data object.
-// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
-// I did nothing (copy and paste). At least I can explain what this is doing.
+// Reference:
+// https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
+// https://golang.org/src/crypto/cipher/example_test.go
 func (d *Data) Encrypt(key string) (string, error) {
 	keyBytes := []byte(key)
 	valueBytes := []byte(d.Value)
@@ -31,6 +32,7 @@ func (d *Data) Encrypt(key string) (string, error) {
 		return "", err
 	}
 
+	// random number generated
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
 		return "", err
@@ -42,8 +44,9 @@ func (d *Data) Encrypt(key string) (string, error) {
 }
 
 // Decrypt decrypts the value from the Data object.
-// Reference: https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
-// I did nothing (copy and paste). At least I can explain what this is doing.
+// Reference:
+// https://www.melvinvivas.com/how-to-encrypt-and-decrypt-data-using-aes/.
+// https://golang.org/src/crypto/cipher/example_test.go
 func (d *Data) Decrypt(key string) (string, error) {
 	keyBytes := []byte(key)
 	valueBytes, err := hex.DecodeString(d.Value)
@@ -63,6 +66,7 @@ func (d *Data) Decrypt(key string) (string, error) {
 
 	nonceSize := aesGCM.NonceSize()
 
+	// Get random number and value
 	nonce, ciphertext := valueBytes[:nonceSize], valueBytes[nonceSize:]
 
 	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
@@ -72,6 +76,3 @@ func (d *Data) Decrypt(key string) (string, error) {
 
 	return fmt.Sprintf("%s", plaintext), nil
 }
-
-// TODO
-// Understant what the code does
